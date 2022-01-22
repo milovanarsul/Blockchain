@@ -58,7 +58,7 @@ class Blockchain{
     }
 }
 
-/*
+/* TEST 1
 let swiftCoin = new Blockchain();
 swiftCoin.addBlock(new Block(1, "22/01/2022", {amount: 4}));
 swiftCoin.addBlock(new Block(2, "22/01/2022", {amount: 10}));
@@ -66,9 +66,22 @@ swiftCoin.addBlock(new Block(2, "22/01/2022", {amount: 10}));
 console.log(JSON.stringify(swiftCoin, null, 4));
 */
 
+/* TEST 2
 let swiftCoin = new Blockchain();
 swiftCoin.addBlock(new Block(1, "22/01/2022", {amount: 4}));
 swiftCoin.addBlock(new Block(2, "22/01/2022", {amount: 10}));
 
 console.log('Is blockchain avalid? ' + swiftCoin.isChainValid());
+*/
+
+/* TEST 3
+let swiftCoin = new Blockchain();
+swiftCoin.addBlock(new Block(1, "22/01/2022", {amount: 4}));
+swiftCoin.addBlock(new Block(2, "22/01/2022", {amount: 10}));
+
+swiftCoin.chain[1].data = {amount: 100};
+//swiftCoin.chain[1].data = swiftCoin.chain[i].calculateHash();
+
+console.log('Is blockchain avalid? ' + swiftCoin.isChainValid());
+*/
 
