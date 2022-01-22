@@ -7,17 +7,29 @@ class Block{
         this.data = data;
         this.previousHash = previousHash;
         this.hash = this.calculateHash(); //calculate the hash of the current block
+        this.nonce = 0; //random number used to calculate the hash of a block
     }
 
     //returns the hash using sha256 for the currentBlock
     calculateHash(){
-        return SHA256(this.index + this.timestamp + this.previousHash + JSON.stringify(this.data)).toString();
+        return SHA256(this.index + this.timestamp + this.previousHash + JSON.stringify(this.data) + this.nonce).toString();
+    }
+
+    //mine the block. Ensures that the hash begins with 'difficulty' amount of zeros.
+    mineBlock(difficulty){
+        while(this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")){
+            this.nonce++;
+            this.hash = this.calculateHash(); //calculate the hash of the mined block
+        }
+
+        console.log("Block mined: " + this.hash);
     }
 }
 
 class Blockchain{
     constructor(){
         this.chain = [this.createGenesisBlock]; //array of blocks. initialize with the genesis Block;
+        this.difficulty = 4; //difficulty for mining a block
     }
 
     //creates the genesis block -- the first block
@@ -32,7 +44,7 @@ class Blockchain{
 
     addBlock(newBlock){
         newBlock.previousHash = this.getLatestBlock().hash;  //hash of the last block in the chain
-        newBlock.hash = newBlock.calculateHash(); //calculate the hash of the new block
+        newBlock.mineBlock(this.difficulty); //mine a new block with the given difficulty
         this.chain.push(newBlock); //add the new block to the chain
     }
 
