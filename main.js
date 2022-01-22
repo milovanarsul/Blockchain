@@ -28,7 +28,7 @@ class Block{
 
 class Blockchain{
     constructor(){
-        this.chain = [this.createGenesisBlock]; //array of blocks. initialize with the genesis Block;
+        this.chain = [this.createGenesisBlock()]; //array of blocks. initialize with the genesis Block;
         this.difficulty = 4; //difficulty for mining a block
     }
 
@@ -70,17 +70,12 @@ class Blockchain{
     }
 }
 
-/*
 let swiftCoin = new Blockchain();
+
+console.log("Mining block 1...");
 swiftCoin.addBlock(new Block(1, "22/01/2022", {amount: 4}));
+
+console.log("Mining block 2...");
 swiftCoin.addBlock(new Block(2, "22/01/2022", {amount: 10}));
 
-console.log(JSON.stringify(swiftCoin, null, 4));
-*/
-
-let swiftCoin = new Blockchain();
-swiftCoin.addBlock(new Block(1, "22/01/2022", {amount: 4}));
-swiftCoin.addBlock(new Block(2, "22/01/2022", {amount: 10}));
-
-console.log('Is blockchain avalid? ' + swiftCoin.isChainValid());
 
