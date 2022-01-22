@@ -1,10 +1,17 @@
 const SHA256 = require('crypto-js/sha256');
 
+class Transaction{
+    constructor(fromAddress, toAddress, amount){
+        this.fromAddress = fromAddress;
+        this.toAddress = toAddress;
+        this.amount = amount;
+    }
+}
+
 class Block{
-    constructor(index, timestamp, data, previousHash=""){
-        this.index = index;
+    constructor(timestamp, transactions, previousHash=""){
         this.timestamp = timestamp;
-        this.data = data;
+        this.transactions = transactions;
         this.previousHash = previousHash;
         this.hash = this.calculateHash(); //calculate the hash of the current block
         this.nonce = 0; //random number used to calculate the hash of a block
@@ -12,7 +19,7 @@ class Block{
 
     //returns the hash using sha256 for the currentBlock
     calculateHash(){
-        return SHA256(this.index + this.timestamp + this.previousHash + JSON.stringify(this.data) + this.nonce).toString();
+        return SHA256(this.index + this.timestamp + this.previousHash + JSON.stringify(this.transactions) + this.nonce).toString();
     }
 
     //mine the block. Ensures that the hash begins with 'difficulty' amount of zeros.
@@ -30,11 +37,13 @@ class Blockchain{
     constructor(){
         this.chain = [this.createGenesisBlock]; //array of blocks. initialize with the genesis Block;
         this.difficulty = 4; //difficulty for mining a block
+        this.pendingTransactions = []; //pending transactions array
+        this.miningReward = 100; //mining reward in coins, for the miner that mines a new block
     }
 
     //creates the genesis block -- the first block
     createGenesisBlock(){
-        return new Block(0, "22/01/2022", "Gensis block", "0");
+        return new Block("22/01/2022", "Gensis block", "0");
     }
 
     //return the latest block in the chain
@@ -42,10 +51,44 @@ class Blockchain{
         return this.chain[this.chain.length-1];
     }
 
-    addBlock(newBlock){
-        newBlock.previousHash = this.getLatestBlock().hash;  //hash of the last block in the chain
-        newBlock.mineBlock(this.difficulty); //mine a new block with the given difficulty
-        this.chain.push(newBlock); //add the new block to the chain
+    //mine the pending transactions and receive reward
+    minePendingTransactions(miningRewardAddress){
+        let block = new Block(Date.now(), this.pendingTransactions, this.getLatestBlock().hash);
+        block.mineBlock(this.difficulty);
+
+        console.log("Block succesfully mined!");
+        this.chain.push(block);
+
+        //create a new transaction to reward the miner after block has been successfully mined
+        this.pendingTransactions = [
+            new Transaction(null, miningRewardAddress, this.miningReward)
+        ];
+    }
+
+    //add a pending transaction to the pending transactions array
+    createTransaction(transaction){
+        this.pendingTransactions.push(transaction);
+    }
+
+    //return the balance of a address
+    getBalanceOfAddress(address){
+        let balance = 0;
+
+        for (const block of this.chain) {
+            for (const trans of block.transactions) {
+                //if you transfer coins to some address, decrease the balance
+                if(trans.fromAddress === address){
+                    balance -= trans.amount;
+                }
+
+                //if you receive coins from some address, increase the balance
+                if(trans.toAddress === address){
+                    balance += trans.amount;
+                }
+            }
+        }
+
+        return balance;
     }
 
     //verifiy the integity of the blockchain
@@ -70,17 +113,11 @@ class Blockchain{
     }
 }
 
-/*
 let swiftCoin = new Blockchain();
-swiftCoin.addBlock(new Block(1, "22/01/2022", {amount: 4}));
-swiftCoin.addBlock(new Block(2, "22/01/2022", {amount: 10}));
+swiftCoin.createTransaction(new Transaction('address1', 'address2', 100));
+swiftCoin.createTransaction(new Transaction('address2', 'address1', 50));
 
-console.log(JSON.stringify(swiftCoin, null, 4));
-*/
+console.log("Starting the miner...");
+swiftCoin.minePendingTransactions('marianAddress');
 
-let swiftCoin = new Blockchain();
-swiftCoin.addBlock(new Block(1, "22/01/2022", {amount: 4}));
-swiftCoin.addBlock(new Block(2, "22/01/2022", {amount: 10}));
-
-console.log('Is blockchain avalid? ' + swiftCoin.isChainValid());
-
+console.log("Balance of marianAddress is: " + swiftCoin.getBalanceOfAddress('marianAddress'));
