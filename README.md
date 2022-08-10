@@ -1,6 +1,6 @@
 # Blockchain implementation
 
-My own blockchain implemenation including features like proof of work, mining rewards & singing transactions.
+My own blockchain implemenation including features like proof of work, mining rewards & signing transactions.
 
 Technologies used:
  - JavaScript
